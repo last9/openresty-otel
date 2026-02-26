@@ -22,7 +22,7 @@ services:
 
   # Example upstream — replace with your own service
   httpbin:
-    image: kennethreitz/httpbin:latest
+    image: ghcr.io/mccutchen/go-httpbin:latest
     container_name: httpbin
     networks:
       - monitoring
