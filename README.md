@@ -17,21 +17,36 @@ OpenTelemetry SDK for OpenResty (nginx + LuaJIT). Traces, metrics, and logs via 
 
 ## Installation
 
-### Via OPM (recommended for OpenResty)
+### Via Dockerfile (recommended)
+
+```dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/* \
+ && git clone --depth 1 https://github.com/last9/openresty-otel.git /tmp/openresty-otel \
+ && cp /tmp/openresty-otel/lua/*.lua /usr/local/openresty/site/lualib/ \
+ && rm -rf /tmp/openresty-otel
+```
+
+Also install the Prometheus and HTTP dependencies from OPM:
+
+```dockerfile
+RUN opm get knyar/nginx-lua-prometheus ledgetech/lua-resty-http
+```
+
+### Via OPM (once `last9` account is registered on opm.openresty.org)
 
 ```bash
 opm get last9/openresty-otel
 ```
 
-### Via LuaRocks
-
-```bash
-luarocks install openresty-otel
-```
-
 ### Manual
 
-Copy `lua/otel_tracer.lua` and `lua/metrics_init.lua` into your OpenResty `lualib` path.
+Copy `lua/otel_tracer.lua` and `lua/metrics_init.lua` into your OpenResty `lualib` path:
+
+```bash
+git clone --depth 1 https://github.com/last9/openresty-otel.git
+cp openresty-otel/lua/*.lua /usr/local/openresty/site/lualib/
+```
 
 ## Quick Start
 
