@@ -258,12 +258,18 @@ function _M.start_span()
 
     -- Expose trace context as nginx variables for access log correlation.
     -- Set unconditionally (even when unsampled) so every log line carries
-    -- trace_id/span_id. Uses pcall so the tracer doesn't break if the
-    -- nginx vars are not declared in the server block.
-    pcall(function()
+    -- trace_id/span_id.
+    -- NOTE: empty trace_id/span_id in logs means start_span() was not reached
+    -- for that request (e.g. locations using nginx `return` directive bypass
+    -- the access phase entirely). Declare `set $otel_trace_id "";` and
+    -- `set $otel_span_id "";` in every server block that uses this tracer.
+    local ok, err = pcall(function()
         ngx.var.otel_trace_id = trace_id
         ngx.var.otel_span_id  = span_id
     end)
+    if not ok then
+        ngx.log(ngx.WARN, "[otel] could not set log vars (declare set $otel_trace_id and $otel_span_id in server block): ", err)
+    end
 end
 
 -- Called in log_by_lua_block.
